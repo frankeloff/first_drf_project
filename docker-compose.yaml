@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  my_app:
+    build: .
+    container_name: my_app
+    volumes:
+      - ./my_proj/:/src/my_proj:rw
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - database
+    command: python ./my_proj/manage.py runserver 0.0.0.0:8000
+      
+  database:
+    container_name: proj_db
+    image: postgres:14.2
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - 5432:${POSTGRES_PORT}
