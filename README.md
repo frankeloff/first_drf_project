@@ -3,7 +3,7 @@
 - Используйте `.env` файл. Вы можете скопировать `.env.example`
 - Используйте `python3 -m venv ./.venv && source ./.venv/bin/activate && pip install -r requirements.txt` (необязательно, нужно только для того, если будет потребность в запуске без докера)
 - Запустите команду `docker compose up -d --build`
-- Выполните миграции `docker exec app python ./my_proj/manage.py migrate`
+- Выполните миграции `docker exec my_app python ./my_proj/manage.py migrate`
 ### Последующие запуски выполняются следующим образом
 - Запускаете команду `sudo docker compose up -d`
 ## Запуск тестов
