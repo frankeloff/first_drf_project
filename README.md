@@ -1,7 +1,7 @@
 # Тестовое задание для: Python[Django] разработчика
 ## Быстрый старт
 - Используйте .env файл. Вы можете скопировать .env.example
-- Используйте `python3 -m venv ./.venv && source ./.venv/bin/activate && pip install -r requirements.txt` (необязательно, нужно только для того, если потребуется потребность в запуске без докера)
+- Используйте `python3 -m venv ./.venv && source ./.venv/bin/activate && pip install -r requirements.txt` (необязательно, нужно только для того, если будет потребность в запуске без докера)
 - Запустите команду `docker compose up -d --build`
 - Выполните миграции `docker exec app python ./my_proj/manage.py migrate`
 ### Последующие запуски выполняются следующим образом
