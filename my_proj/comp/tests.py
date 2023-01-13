@@ -494,7 +494,11 @@ class DataReturnTests(APITestCase):
     def test_search_filter_in_organizations_from_a_specific_area_data(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_test1_token.key)
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?category_name=Для%20ухода",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?category_name=Для%20ухода",
             format="json",
         )
         serializer_data1 = EnterpriseSerializer(self.enterprise_test_1).data
@@ -504,7 +508,11 @@ class DataReturnTests(APITestCase):
         self.assertIn(serializer_data2, response.data)
 
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?category_name=Мебель",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?category_name=Мебель",
             format="json",
         )
         serializer_data5 = EnterpriseSerializer(self.enterprise_test_5).data
@@ -513,7 +521,11 @@ class DataReturnTests(APITestCase):
     def test_price_filter_in_organizations_from_a_specific_area_data(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_test1_token.key)
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?price__lt=200",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?price__lt=200",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -523,7 +535,11 @@ class DataReturnTests(APITestCase):
         self.assertIn(serializer_data5, response.data)
 
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?price__gt=200",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?price__gt=200",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -533,7 +549,11 @@ class DataReturnTests(APITestCase):
     def test_search_and_price_filters_in_organizations_from_a_specific_area_data(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_test1_token.key)
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?price__lt=200&category_name=Для%20ухода",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?price__lt=200&category_name=Для%20ухода",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -541,7 +561,11 @@ class DataReturnTests(APITestCase):
         self.assertIn(serializer_data1, response.data)
 
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?price__lt=200&category_name=Мебель",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?price__lt=200&category_name=Мебель",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -549,7 +573,11 @@ class DataReturnTests(APITestCase):
         self.assertIn(serializer_data5, response.data)
 
         response = self.client.get(
-            f"http://localhost:8000/api/v1/organizations/{self.cityarea_test1.pk}/?price__gt=200&category_name=Для%20ухода",
+            reverse(
+                "organizations_from_a_specific_area",
+                kwargs={"district_id": self.cityarea_test1.pk},
+            )
+            + "?price__gt=200&category_name=Для%20ухода",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
