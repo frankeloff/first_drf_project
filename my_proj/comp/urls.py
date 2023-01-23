@@ -6,6 +6,10 @@ from .views import (
     DetailServiceInformation,
     DetailEnterpriseInformation,
     DetailActiveServiceInformation,
+    DetailAboutParticularActiveServiceInformation,
+    DetailAboutParticularEnterpriseInformation,
+    DetailAboutParticularEnterpriseServiceInformation,
+    DetailAboutParticularServiceInformation,
 )
 
 urlpatterns = [
@@ -26,7 +30,7 @@ urlpatterns = [
     ),  # Детальная информация о заведениях
     path(
         "api/v1/organizations/all/details/<int:pk>/",
-        DetailEnterpriseInformation.as_view(),
+        DetailAboutParticularEnterpriseInformation.as_view(),
         name="current_organization_detail",
     ),  # Детальная информация о заведении
     path(
@@ -36,7 +40,7 @@ urlpatterns = [
     ),  # Детальная информация о заведениях, которые есть на рынке
     path(
         "api/v1/organizations/active/details/<int:pk>/",
-        DetailEnterpriseServiceInformation.as_view(),
+        DetailAboutParticularEnterpriseServiceInformation.as_view(),
         name="current_active_organization_detail",
     ),  # Детальная информация о заведении, которое есть на рынке
     path(
@@ -46,7 +50,7 @@ urlpatterns = [
     ),  # Детальная информация о товарах/услугах
     path(
         "api/v1/services/all/details/<int:pk>/",
-        DetailServiceInformation.as_view(),
+        DetailAboutParticularServiceInformation.as_view(),
         name="current_service_detail",
     ),  # Детальная информация о товаре/услуге
     path(
@@ -56,7 +60,7 @@ urlpatterns = [
     ),  # Детальная информация о товарах/услугах, которые есть в продаже
     path(
         "api/v1/services/active/details/<int:pk>/",
-        DetailActiveServiceInformation.as_view(),
+        DetailAboutParticularActiveServiceInformation.as_view(),
         name="current_active_service_detail",
     ),  # Детальная информация о товаре/услугe, который/которая есть в продаже
     path("api/v1/auth/", include("djoser.urls")),

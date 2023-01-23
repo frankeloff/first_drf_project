@@ -18,7 +18,6 @@ from .serializers import (
     DetailedServiceSerializer,
     DetailEnterpriseAndServiceSerializer,
     DetailedEnterpriseSerializer,
-    ServiceSerializer,
 )
 
 
@@ -34,10 +33,29 @@ class AuthorizationTests(APITestCase):
         self.user_test1_token = Token.objects.create(user=user_test1)
 
         # Вспомогательные элементы
-        category_test1 = Category.objects.create(category_name="Для ухода")
-        category_test1.save()
+        self.category_test1 = Category.objects.create(category_name="Для ухода")
+        self.category_test1.save()
 
-        self.service_data = {"service_name": "Мыло", "category": category_test1.pk}
+        self.enterprice_network_test1 = EnterpriseNetwork.objects.create(
+            enterprise_network_name="ProductsComp"
+        )
+        self.enterprice_network_test1.save()
+
+        self.enterprise_test_1 = Enterprise.objects.create(
+            enterprise_name="Пятерочка",
+            description="Магазин продуктов",
+            enterprise_network=EnterpriseNetwork.objects.get(
+                enterprise_network_name="ProductsComp"
+            ),
+        )
+        self.enterprise_test_1.save()
+
+        self.service_test1 = Service.objects.create(
+            service_name="Расческа", category=self.category_test1
+        )
+        self.service_test1.save()
+
+        self.service_data = {"service_name": "Мыло", "category": self.category_test1.pk}
 
     # Тестирование на защищенность API токеном всех API
     # Тестирование всех предприятий
@@ -59,7 +77,10 @@ class AuthorizationTests(APITestCase):
     def test_get_enterprise(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_test1_token.key)
         response = self.client.get(
-            reverse("current_organization_detail", kwargs={"pk": 1}), format="json"
+            reverse(
+                "current_organization_detail", kwargs={"pk": self.enterprise_test_1.pk}
+            ),
+            format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -111,7 +132,8 @@ class AuthorizationTests(APITestCase):
     def test_get_service(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_test1_token.key)
         response = self.client.get(
-            reverse("current_service_detail", kwargs={"pk": 1}), format="json"
+            reverse("current_service_detail", kwargs={"pk": self.service_test1.pk}),
+            format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -362,7 +384,7 @@ class DataReturnTests(APITestCase):
         )
         serializer_data1 = DetailedEnterpriseSerializer(self.enterprise_test_1).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(serializer_data1, response.data)
+        self.assertEqual(serializer_data1, response.data)
 
     # Получение информации об активных организациях
     def test_get_all_active_enterprises_data(self):
@@ -426,7 +448,7 @@ class DataReturnTests(APITestCase):
         )
         serializer_data1 = DetailedServiceSerializer(self.service_test1).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(serializer_data1, response.data)
+        self.assertEqual(serializer_data1, response.data)
 
     # Получение детальной информации о товарах/услугах, которые есть на рынке
     def test_get_all_acative_services_data(self):

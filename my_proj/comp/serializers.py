@@ -5,25 +5,25 @@ from .models import Service, Enterprise, EnterpriseNetwork, EnterpriseService, C
 class EnterpriseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enterprise
-        fields = "__all__"
+        fields = ("pk", "enterprise_name", "description", "enterprise_network")
 
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = "__all__"
+        fields = ("pk", "service_name", "category")
 
 
 class EnterpriseNetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnterpriseNetwork
-        fields = "__all__"
+        fields = ("pk", "enterprise_network_name")
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = "__all__"
+        fields = ("pk", "category_name")
 
 
 class DetailedEnterpriseSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class DetailedEnterpriseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enterprise
-        fields = "__all__"
+        fields = ("pk", "enterprise_name", "description", "enterprise_network")
 
 
 class DetailedServiceSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class DetailedServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = "__all__"
+        fields = ("pk", "service_name", "category")
 
 
 class DetailedServiceWithPriceSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class DetailedServiceWithPriceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EnterpriseService
-        fields = "__all__"
+        fields = ("pk", "service", "price")
 
 
 class DetailEnterpriseAndServiceSerializer(serializers.ModelSerializer):
@@ -56,4 +56,4 @@ class DetailEnterpriseAndServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EnterpriseService
-        fields = "__all__"
+        fields = ("pk", "enterprise", "service", "price")

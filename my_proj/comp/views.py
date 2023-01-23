@@ -16,92 +16,104 @@ from .filters import CategoryAndPriceFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 
+
+class BaseListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+
+class BaseCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+
+class BaseRetrieveAPIView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+
 # Вывод всех заведений или конкретного с возможностями поиска и фильтрами
-class EnterpriseAPIList(generics.ListAPIView):
+class EnterpriseAPIList(BaseListAPIView):
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     serializer_class = EnterpriseSerializer
     filterset_class = CategoryAndPriceFilter
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
     search_fields = ("enterpriseservice__service__service_name",)
 
     def get_queryset(self):
-        try:
-            district_id = self.kwargs["district_id"]
-            queryset = CityAreaEnterprise.objects.all()
-            if district_id is not None:
-                queryset = queryset.filter(city_area__pk=district_id)
-                queryset = Enterprise.objects.filter(
-                    id__in=queryset.values("enterprise")
-                )
-                return queryset
-        except:
-            return Enterprise.objects.all()
+        district_id = self.kwargs["district_id"]
+        city_area_enterprise = CityAreaEnterprise.objects.all()
+        particular_enterprises = city_area_enterprise.filter(city_area__pk=district_id)
+        queryset = Enterprise.objects.filter(
+            id__in=particular_enterprises.values("enterprise")
+        )
+        return queryset
 
 
 # Добавление товара/услуги
-class ServiceAPICreate(generics.CreateAPIView):
+class ServiceAPICreate(BaseCreateAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
 
-# Детальная информация обо всех заведении/заведениях (даже о тех, которых нет на рынке)
-class DetailEnterpriseInformation(generics.ListAPIView):
+# Детальная информация обо всех заведениях (даже о тех, которых нет на рынке)
+class DetailEnterpriseInformation(BaseListAPIView):
+    queryset = Enterprise.objects.all()
     serializer_class = DetailedEnterpriseSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
+
+
+# Детальная информация о конкретном заведении(даже о том, которого нет на рынке)
+class DetailAboutParticularEnterpriseInformation(BaseRetrieveAPIView):
+    serializer_class = DetailedEnterpriseSerializer
 
     def get_queryset(self):
-        try:
-            ent_id = self.kwargs["pk"]
-            queryset = Enterprise.objects.filter(pk=ent_id)
-            return queryset
-        except:
-            return Enterprise.objects.all()
+        ent_id = self.kwargs["pk"]
+        queryset = Enterprise.objects.filter(pk=ent_id)
+        return queryset
 
 
-# Детальная информация по заведению/заведениям, которые есть на рынке
-class DetailEnterpriseServiceInformation(generics.ListAPIView):
+# Детальная информация по заведениям, которые есть на рынке
+class DetailEnterpriseServiceInformation(BaseListAPIView):
+    queryset = EnterpriseService.objects.all()
     serializer_class = DetailEnterpriseAndServiceSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
+
+
+# Детальная информация по заведению, которые есть на рынке
+class DetailAboutParticularEnterpriseServiceInformation(BaseListAPIView):
+    serializer_class = DetailEnterpriseAndServiceSerializer
 
     def get_queryset(self):
-        try:
-            ent_service_id = self.kwargs["pk"]
-            queryset = EnterpriseService.objects.filter(enterprise__pk=ent_service_id)
-            return queryset
-        except:
-            return EnterpriseService.objects.all()
+        ent_service_id = self.kwargs["pk"]
+        queryset = EnterpriseService.objects.filter(enterprise__pk=ent_service_id)
+        return queryset
 
 
-# Детальная информация по товарам/услугах или товаре/услуге, которые есть в продаже
-class DetailActiveServiceInformation(generics.ListAPIView):
+# Детальная информация по товарам/услугах, которые есть в продаже
+class DetailActiveServiceInformation(BaseListAPIView):
+    queryset = EnterpriseService.objects.all()
     serializer_class = DetailedServiceWithPriceSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
+
+
+# Детальная информация о товаре/услуге, которые есть в продаже
+class DetailAboutParticularActiveServiceInformation(BaseListAPIView):
+    serializer_class = DetailedServiceWithPriceSerializer
 
     def get_queryset(self):
-        try:
-            active_service_id = self.kwargs["pk"]
-            queryset = EnterpriseService.objects.filter(service__pk=active_service_id)
-            return queryset
-        except:
-            return EnterpriseService.objects.all()
+        active_service_id = self.kwargs["pk"]
+        queryset = EnterpriseService.objects.filter(service__pk=active_service_id)
+        return queryset
 
 
-# Детальная информация по всем товарам/услугах или о конкретном товаре/услуге (даже по тем, которых нет в продаже/которого нет в продаже у заведений)
-class DetailServiceInformation(generics.ListAPIView):
+# Детальная информация по всем товарам/услугах (даже по тем, которых нет в продаже/которого нет в продаже у заведений)
+class DetailServiceInformation(BaseListAPIView):
+    queryset = Service.objects.all()
     serializer_class = DetailedServiceSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
+
+
+# Детальная информация о конкретном товаре/услуге (даже по тем, которых нет в продаже/которого нет в продаже у заведений)
+class DetailAboutParticularServiceInformation(BaseRetrieveAPIView):
+    serializer_class = DetailedServiceSerializer
 
     def get_queryset(self):
-        try:
-            service_id = self.kwargs["pk"]
-            queryset = Service.objects.filter(pk=service_id)
-            return queryset
-        except:
-            return Service.objects.all()
+        service_id = self.kwargs["pk"]
+        queryset = Service.objects.filter(pk=service_id)
+        return queryset
