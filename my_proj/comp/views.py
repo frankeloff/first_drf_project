@@ -1,6 +1,17 @@
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from .models import Service, Enterprise, CityAreaEnterprise, EnterpriseService
+from .comp_service import (
+    get_city_area_enterprises_by_city_area_id,
+    get_enterprises_in_certain_city_area,
+    get_all_services,
+    get_all_enterprises,
+    get_certain_enterprise_by_enterprise_id,
+    get_all_enterprise_service,
+    get_certain_enterprise_service_by_enterprise_id,
+    get_certain_enterprise_service_by_service_id,
+    get_all_services,
+    get_certain_service_by_service_id,
+)
 from .serializers import (
     ServiceSerializer,
     EnterpriseSerializer,
@@ -41,23 +52,24 @@ class EnterpriseAPIList(BaseListAPIView):
 
     def get_queryset(self):
         district_id = self.kwargs["district_id"]
-        city_area_enterprise = CityAreaEnterprise.objects.all()
-        particular_enterprises = city_area_enterprise.filter(city_area__pk=district_id)
-        queryset = Enterprise.objects.filter(
-            id__in=particular_enterprises.values("enterprise")
+        particular_enterprises = get_city_area_enterprises_by_city_area_id(
+            city_area_id=district_id
+        )
+        queryset = get_enterprises_in_certain_city_area(
+            city_area_enterprises=particular_enterprises
         )
         return queryset
 
 
 # Добавление товара/услуги
 class ServiceAPICreate(BaseCreateAPIView):
-    queryset = Service.objects.all()
+    queryset = get_all_services()
     serializer_class = ServiceSerializer
 
 
 # Детальная информация обо всех заведениях (даже о тех, которых нет на рынке)
 class DetailEnterpriseInformation(BaseListAPIView):
-    queryset = Enterprise.objects.all()
+    queryset = get_all_enterprises()
     serializer_class = DetailedEnterpriseSerializer
 
 
@@ -67,13 +79,13 @@ class DetailAboutParticularEnterpriseInformation(BaseRetrieveAPIView):
 
     def get_queryset(self):
         ent_id = self.kwargs["pk"]
-        queryset = Enterprise.objects.filter(pk=ent_id)
+        queryset = get_certain_enterprise_by_enterprise_id(ent_id=ent_id)
         return queryset
 
 
 # Детальная информация по заведениям, которые есть на рынке
 class DetailEnterpriseServiceInformation(BaseListAPIView):
-    queryset = EnterpriseService.objects.all()
+    queryset = get_all_enterprise_service()
     serializer_class = DetailEnterpriseAndServiceSerializer
 
 
@@ -82,14 +94,14 @@ class DetailAboutParticularEnterpriseServiceInformation(BaseListAPIView):
     serializer_class = DetailEnterpriseAndServiceSerializer
 
     def get_queryset(self):
-        ent_service_id = self.kwargs["pk"]
-        queryset = EnterpriseService.objects.filter(enterprise__pk=ent_service_id)
+        ent_id = self.kwargs["pk"]
+        queryset = get_certain_enterprise_service_by_enterprise_id(ent_id=ent_id)
         return queryset
 
 
 # Детальная информация по товарам/услугах, которые есть в продаже
 class DetailActiveServiceInformation(BaseListAPIView):
-    queryset = EnterpriseService.objects.all()
+    queryset = get_all_enterprise_service()
     serializer_class = DetailedServiceWithPriceSerializer
 
 
@@ -99,13 +111,15 @@ class DetailAboutParticularActiveServiceInformation(BaseListAPIView):
 
     def get_queryset(self):
         active_service_id = self.kwargs["pk"]
-        queryset = EnterpriseService.objects.filter(service__pk=active_service_id)
+        queryset = get_certain_enterprise_service_by_service_id(
+            service_id=active_service_id
+        )
         return queryset
 
 
 # Детальная информация по всем товарам/услугах (даже по тем, которых нет в продаже/которого нет в продаже у заведений)
 class DetailServiceInformation(BaseListAPIView):
-    queryset = Service.objects.all()
+    queryset = get_all_services()
     serializer_class = DetailedServiceSerializer
 
 
@@ -115,5 +129,5 @@ class DetailAboutParticularServiceInformation(BaseRetrieveAPIView):
 
     def get_queryset(self):
         service_id = self.kwargs["pk"]
-        queryset = Service.objects.filter(pk=service_id)
+        queryset = get_certain_service_by_service_id(service_id=service_id)
         return queryset

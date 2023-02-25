@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("comp", "0005_remove_enterpriseservice_enterprise_and_more"),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("comp", "0003_rename_city_area_id_cityareaenterprise_city_area_and_more"),
     ]
